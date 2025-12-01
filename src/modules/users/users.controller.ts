@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoggingInteraptor } from 'src/interaptors/loggingInteraptor';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
+import { LoginDto } from './dto/login.user.Dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('users')
 @UseInterceptors(LoggingInteraptor) // 2-usul
@@ -11,27 +13,36 @@ export class UsersController {
     
     @Get()
     // @UseInterceptors(LoggingInteraptor) 1-usul
+    @UseGuards(AuthGuard)
     getAllUsers() {
-        this.userService.findAll()
+        return this.userService.findAll()
     }
 
     @Get(':id')
-    getOne(@Param('id') id : string) {
-        this.userService.findOne(+id);
+    @UseGuards(AuthGuard)
+    getOne(@Request() req, @Param('id') id : string) {
+        return this.userService.findOne(+id, req.user);
     }
 
-    @Post()
-    createUser(@Body() payload: CreateUserDto) {
-        this.userService.create(payload);
+    @Post('register')
+    registerUser(@Body() payload: CreateUserDto) {
+        return this.userService.register(payload);
+    }
+
+    @Post('login')
+    loginUser(@Body() payload: LoginDto) {
+        return this.userService.login(payload);
     }
 
     @Put(':id')
-    updateUser(@Param('id') id: string, @Body() payload : UpdateUserDto) {
-        this.userService.update(+id, payload);
+    @UseGuards(AuthGuard)
+    updateUser(@Request() req, @Param('id') id: string, @Body() payload : UpdateUserDto) {
+        return this.userService.update(+id, payload, req.user);
     }
 
     @Delete(':id')
-    deleteUser(@Param('id') id: string) {
-        this.userService.delete(+id);
+    @UseGuards(AuthGuard)
+    deleteUser(@Request() req, @Param('id') id: string) {
+        return this.userService.delete(+id, req.user);
     }
 }

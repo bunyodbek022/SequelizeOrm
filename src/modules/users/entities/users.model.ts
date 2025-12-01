@@ -1,4 +1,4 @@
-import { DataType, HasMany, Model } from 'sequelize-typescript';
+import { AllowNull, DataType, HasMany, Model } from 'sequelize-typescript';
 import { Column, Table } from 'sequelize-typescript';
 import { Posts } from 'src/modules/posts/entities/post.entity';
 
@@ -17,7 +17,16 @@ export class User extends Model {
   })
   password: string;
 
-  @Column({ defaultValue: false })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false
+  })
+   email: string
+    
+  @Column({
+    defaultValue: false,
+    allowNull: true
+   })
   isActive: boolean;
 
   @HasMany(() => Posts)
