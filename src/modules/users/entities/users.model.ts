@@ -4,7 +4,7 @@ import { Posts } from 'src/modules/posts/entities/post.entity';
 
 
 @Table({ tableName: 'users' })
-export class User extends Model {
+export class User extends Model<User, { firstname: string , password : string, email: string}> {
   @Column({
     type: DataType.STRING,
     allowNull: false,

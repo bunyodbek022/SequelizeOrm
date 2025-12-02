@@ -5,7 +5,7 @@ import { Request } from "express";
 export class AuthGuard implements CanActivate{
     constructor(private jwtService: JwtService) { }
     
-    canActivate(context: ExecutionContext): boolean {
+    async canActivate(context: ExecutionContext): Promise<boolean> {
         const req = context.switchToHttp().getRequest<Request>();
 
         const authHeader = req.headers.authorization;
@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate{
         const token = authHeader.split(" ")[1];
 
         try {
-            const payload = this.jwtService.verifyAsync(token)
+            const payload = await this.jwtService.verifyAsync(token)
 
             req['user'] = payload;
 

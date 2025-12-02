@@ -13,9 +13,9 @@ import { User } from './entities/users.model';
 import { UpdateUserDto } from './dto/update.user.dto';
 import { CreateUserDto } from './dto/create.user.dto';
 import * as bcrypt from 'bcrypt';
-import { first } from 'rxjs';
 import { LoginDto } from './dto/login.user.Dto';
 import { JwtService } from '@nestjs/jwt';
+import { Posts } from '../posts/entities/post.entity';
 
 @Injectable()
 export class UsersService {
@@ -42,22 +42,21 @@ export class UsersService {
     try {
       if (userFromToken.id !== id)
         throw new NotAcceptableException("You don't have access");
-      const userExist = await this.userModel.findByPk(id);
+      const userExist = await this.userModel.findOne({where : {id}, include: [Posts]});
       if (!userExist) throw new NotFoundException('User not found');
-      const userPlain = userExist.get({ plain: true });
-      delete userPlain.password;
+      const { password, ...userPlain }  = userExist.get({ plain: true });
       return userPlain;
     } catch (error) {
       if (error instanceof HttpException) throw error;
 
-      console.error('Register error:', error);
+      console.error('find one user error:', error);
       throw new InternalServerErrorException(
-        'Something went wrong during registration',
+        'Something went wrong during find one user',
       );
     }
   }
 
-  async register(@Body() userDto: CreateUserDto): Promise<User> {
+  async register(@Body() userDto: CreateUserDto) {
     try {
       if (!userDto) {
         throw new NotFoundException('Body is empty');
@@ -72,9 +71,8 @@ export class UsersService {
         password: hashedPassword,
         email: userDto.email,
       });
-      const userPlain = user.get({ plain: true });
-      delete userPlain.password;
-      return userPlain;
+      const { password, ...userPlain }  = user.get({ plain: true }); 
+       return userPlain;
     } catch (error) {
       if (error instanceof HttpException) throw error;
 
@@ -107,16 +105,15 @@ export class UsersService {
         email: userExist.email,
       });
 
-       const userPlain = Exist.get({ plain: true });
-      delete userPlain.password;
+      const { password, ...userPlain } = Exist.get({ plain: true });
       const id = userPlain.id
        await this.userModel.update({isActive : true}, { where: { id } });
       return { message: 'Login successful', token, data: userPlain };
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      console.error('Register error:', error);
+      console.error('login error:', error);
       throw new InternalServerErrorException(
-        'Something went wrong during registration',
+        'Something went wrong during login',
       );
     }
   }
@@ -148,9 +145,9 @@ export class UsersService {
       return { mesage: 'User deleted succesfully' };
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      console.error('Register error:', error);
+      console.error('delete user error:', error);
       throw new InternalServerErrorException(
-        'Something went wrong during registration',
+        'Something went wrong during delete user',
       );
     }
   }

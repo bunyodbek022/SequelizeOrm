@@ -9,7 +9,7 @@ import {
 import { User } from 'src/modules/users/entities/users.model';
 
 @Table({ tableName: 'posts' })
-export class Posts extends Model<Posts> {
+export class Posts extends Model<Posts, {title: string, userId:number}> {
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
