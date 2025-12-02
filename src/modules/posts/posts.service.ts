@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -11,7 +10,6 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Posts } from './entities/post.entity';
 import { User } from '../users/entities/users.model';
-import { where } from 'sequelize';
 
 @Injectable()
 export class PostsService {
@@ -22,7 +20,7 @@ export class PostsService {
     private userModel: typeof User,
   ) {}
 
-  async create(userFromToken, createPostDto: CreatePostDto): Promise<Posts> {
+  async create(createPostDto: CreatePostDto, userFromToken): Promise<Posts> {
     try {
       if (!userFromToken) throw new UnauthorizedException('User have to login');
       const existUser = await this.userModel.findOne({

@@ -5,11 +5,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './entities/users.model';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PostsModule } from '../posts/posts.module';
+import { Posts } from '../posts/entities/post.entity';
+
 
 @Module({
-  imports: [SequelizeModule.forFeature([User]),
-   SequelizeModule.forFeature([User]),
+  imports: [SequelizeModule.forFeature([User, Posts]),
   JwtModule.registerAsync({
     imports: [ConfigModule],
     inject: [ConfigService],
@@ -20,5 +20,6 @@ import { PostsModule } from '../posts/posts.module';
   })],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [JwtModule, UsersService],
 })
 export class UsersModule {}

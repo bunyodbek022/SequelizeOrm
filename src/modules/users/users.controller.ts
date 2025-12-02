@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseBoolPipe, Post, Put, Query, Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoggingInteraptor } from 'src/interaptors/loggingInteraptor';
 import { CreateUserDto } from './dto/create.user.dto';
@@ -42,7 +42,7 @@ export class UsersController {
 
     @Delete(':id')
     @UseGuards(AuthGuard)
-    deleteUser(@Request() req, @Param('id') id: string) {
-        return this.userService.delete(+id, req.user);
+    deleteUser(@Request() req, @Param('id') id: string, @Query('force' , ParseBoolPipe) force : boolean, ) {
+        return this.userService.delete(+id, req.user, force);
     }
 }
